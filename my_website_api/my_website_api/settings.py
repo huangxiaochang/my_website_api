@@ -30,6 +30,8 @@ CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
 # Application definition
+# get 请求url不用加后面的/
+APPEND_SLASH = True
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -55,6 +57,13 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'my_website_api.urls'
+# 邮件配置
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'mail.qq.com'
+EMAIL_PORT = 25
+EMAIL_HOST_USER = '2297820776@qq.com'
+EMAIL_HOST_PASSWORD = 'hxc625526'
+CONFIRM_DAYS = 1
 
 # 配置前端模块的路径
 TEMPLATES = [
