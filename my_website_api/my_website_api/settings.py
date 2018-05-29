@@ -59,10 +59,12 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'my_website_api.urls'
 # 邮件配置
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'mail.qq.com'
-EMAIL_PORT = 25
+
+EMAIL_HOST = 'smtp.qq.com'
+EMAIL_PORT = 465
 EMAIL_HOST_USER = '2297820776@qq.com'
-EMAIL_HOST_PASSWORD = 'hxc625526'
+EMAIL_HOST_PASSWORD = 'lgbwlgbxgizediab'
+DEFAULT_FROM_EMAIL = '2297820776@qq.com'
 CONFIRM_DAYS = 1
 
 # 配置前端模块的路径

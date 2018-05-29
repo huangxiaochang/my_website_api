@@ -41,12 +41,18 @@ class RegisterView(APIView):
                 user_info = UserInfo()
                 user_info.name = name
                 user_info.email = email
-                user_info.password = password
+                user_info.password = self._pass_encryption(password)
                 user_info.save()
                 return Response({'success': 1, 'msg': u'注册成功'})
         else:
             return Response({'success': 0, 'msg': u'注册失败,用户信息不全'})
-        
+
+    # 使用md5对密码进行加密
+    def _pass_encryption(self, password):
+        import hashlib
+        m = hashlib.md5(password.encode(encoding='utf-8'))
+        return m.hexdigest()
+
     def get(self, request):
         email = request.GET.get('email')
         if email:
@@ -59,9 +65,11 @@ class RegisterView(APIView):
                 user.email = email
                 user.code = code
                 user.add_time = datetime.now()
-            self._send_email(email, code)
-            user.save()
-            return Response({'success': 1, 'msg': u'验证码已发送到你的邮箱，请前往验证', 'data': code})
+            if self._send_email(email, code):
+                user.save()
+                return Response({'success': 1, 'msg': u'验证码已发送到你的邮箱，请前往验证', 'data': code})
+            else:
+                return Response({'success': 0, 'msg': u'服务器错误'})
         else:
             return Response({'success': 0, 'msg': u'邮箱不能为空'})
     
@@ -72,17 +80,22 @@ class RegisterView(APIView):
     def _send_email(self, email, code):
         # 在邮件中添加附件的发送方法
         from django.conf import settings
-        # from django.core.mail import EmailMultiAlternatives
-        from django.core.mail import send_mail
-        subject = '来自10.249.30.112:8000的注册确认邮件'
-        
-        text_content = '感谢您注册hxc的个人网站，请放心，此完整只是用于学习，不会进行用户信息的手机, 您的验证码是{}'.format(code)
-        
-        html_content = '''
-                        <p>您的验证码是{}</p>
-                        <p>有效期为24小时，请尽快完成验证,谢谢!</p>
-                        '''.format(code)
-        send_mail(subject, text_content, settings.EMAIL_HOST_USER, [email])
-        # msg = EmailMultiAlternatives(subject, text_content, settings.EMAIL_HOST_USER, [email])
-        # msg.attach_alternative(html_content, "text/html")
-        # msg.send()
+        import smtplib
+        from email.mime.text import MIMEText
+        from email.utils import formataddr
+
+        ret = True
+
+        try:
+            msg = MIMEText("欢迎注册hxc个人网站，您的验证码是%s,请在24小时内完成注册" % code, 'plain', 'utf-8')
+            msg['From'] = formataddr(["huangxiaochang", settings.EMAIL_HOST_USER])
+            msg['To'] = formataddr(['hxc', email])
+            msg['Subject'] = "注册验证码"
+            server=smtplib.SMTP_SSL("smtp.qq.com", 465)
+            server.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
+            server.sendmail(settings.EMAIL_HOST_USER, [email,], msg.as_string())
+            server.quit()
+        except Exception:
+            ret=False
+        return ret
+
