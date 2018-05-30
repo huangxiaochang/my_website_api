@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import UserInfo, ConfirmInfo
-
+import traceback
 
 # 返回首页
 def index(request):
@@ -69,7 +69,7 @@ class RegisterView(APIView):
                 user.save()
                 return Response({'success': 1, 'msg': u'验证码已发送到你的邮箱，请前往验证', 'data': code})
             else:
-                return Response({'success': 0, 'msg': u'服务器错误'})
+                return Response({'success': 0, 'msg': u'邮箱不正确!'})
         else:
             return Response({'success': 0, 'msg': u'邮箱不能为空'})
     
@@ -95,7 +95,9 @@ class RegisterView(APIView):
             server.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
             server.sendmail(settings.EMAIL_HOST_USER, [email,], msg.as_string())
             server.quit()
-        except Exception:
+        except Exception as e:
+
+            traceback.print_exc()
             ret=False
         return ret
 
