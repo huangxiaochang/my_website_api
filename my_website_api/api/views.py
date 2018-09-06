@@ -4,15 +4,21 @@ from datetime import datetime
 from django.shortcuts import render, render_to_response, redirect
 
 # Create your views here.
+from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import UserInfo, ConfirmInfo
 import traceback
 
-# 返回首页
+# 返回首页index.html
 def index(request):
     return render_to_response('index.html')
+    # return HttpResponse('hello word')
+
+def page_not_found(requests, arg = None):
+    response = render_to_response('index.html')
+    return response
 
 # 用户注册
 class RegisterView(APIView):
@@ -100,4 +106,3 @@ class RegisterView(APIView):
             traceback.print_exc()
             ret=False
         return ret
-

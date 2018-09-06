@@ -41,8 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'api',
-    'corsheaders',
-    'rest_framework'
+    'corsheaders',  # 解决跨域相关的库
+    'rest_framework'  # 请求返回相关的库
 ]
 
 MIDDLEWARE = [
@@ -144,3 +144,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static/static/"),
 ]
+
+# 上传文件的路径配置
+MEDIA_ROOT = os.path.join(BASE_DIR, "static/images/")
+MEDIA_URL = '/upload/'  # 这个是在浏览器上访问该文件的url的前缀
