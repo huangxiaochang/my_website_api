@@ -14,7 +14,7 @@ class UserInfo(models.Model):
     avatar_url = models.CharField(max_length=255, null=True)
     role = models.CharField(max_length=255, default='admin')
     operate_permission = models.CharField(max_length=255, default='look')
-    update_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(null=True)
 
     def __str__(self):
         return self.name
