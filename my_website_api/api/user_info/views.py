@@ -1,6 +1,9 @@
+import base64
 import random
 import re
 from datetime import datetime
+from io import StringIO
+from django.utils.six import BytesIO
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, redirect
@@ -14,6 +17,7 @@ from api.models import UserInfo, ConfirmInfo
 
 import traceback
 from xlwt import Workbook
+from PIL import Image, ImageDraw, ImageFont
 
 # 返回首页
 from api.utils.user_util import pass_encryption, make_signed_cookie, hasUser, login_require
@@ -23,10 +27,10 @@ from my_website_api.settings import MEDIA_ROOT, MEDIA_URL
 # 用户注册
 class RegisterView(APIView):
     def post(self, request):
-        name = request.data.get('account_name')
-        email = request.data.get('user_email')
+        name = request.data.get('name')
+        email = request.data.get('email')
         password = request.data.get('password')
-        code = request.data.get('verification_code')
+        code = request.data.get('code')
         if not name:
             return Response({'success': 0, 'msg': u'注册失败,用户名不能为空'})
         if not email:
@@ -99,9 +103,11 @@ class RegisterView(APIView):
             msg['From'] = formataddr(["huangxiaochang", settings.EMAIL_HOST_USER])
             msg['To'] = formataddr(['hxc', email])
             msg['Subject'] = "注册验证码"
-            server=smtplib.SMTP_SSL("smtp.qq.com", 465)
+            server = smtplib.SMTP_SSL("smtp.qq.com", 465)  # SMTP_SSL的默认端口是465
             server.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
+            # 参数， from， to(列表), mesaage
             server.sendmail(settings.EMAIL_HOST_USER, [email,], msg.as_string())
+            # 关闭连接并退出
             server.quit()
         except Exception as e:
             traceback.print_exc()
@@ -110,11 +116,14 @@ class RegisterView(APIView):
 
 # 用户登录
 class LoginView(APIView):
-    def get(self, request):
-        name = request.GET.get('name')
-        psd = request.GET.get('password')
-        if not name or not psd:
-            return Response({'success': 0, 'msg': u'请输入用户名和密码!'})
+    def post(self, request):
+        name = request.data.get('name')
+        psd = request.data.get('password')
+        code = request.data.get('code')
+        if code and code != request.session['captcha_code']:
+            return Response({'success': 0, 'msg': u'验证码不正确!'})
+        if not name or not psd or not code:
+            return Response({'success': 0, 'msg': u'请填写完整登录信息!'})
         else:
             password = pass_encryption(psd)
             # 如果是用filter的话，返回的一个集合，使用get的话，返回的是一个对象
@@ -130,6 +139,32 @@ class LoginView(APIView):
             return response
         else:
             return HttpResponse(json.dumps({'success': 0, 'msg': u'用户名或者密码不正确!'}))
+
+    # 生成图形验证码
+    def get(self, request):
+        img = Image.new(mode='RGB', size=(100, 30), color=(255, 255, 255))
+        draw = ImageDraw.Draw(img, mode='RGB')
+        font = ImageFont.truetype("calibri.ttf", 20)
+        draw.line((20, 18, 80, 18), fill='red')
+        draw.arc((10, 0, 70, 25), 0, 270, fill='green')
+        draw.point([50, 15], fill=(0, 0, 0))
+        code = ''
+        for i in range(4):
+            char = random.choice([chr(random.randint(65, 90)), str(random.randint(0, 9))])
+            code += char
+            color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+            draw.text([i * 25, 12], char, color, font=font)
+        request.session['captcha_code'] = code
+        # filepath = MEDIA_ROOT + 'captcha.png'
+        # file_url = MEDIA_URL + 'captcha.png'
+        # with open(filepath, 'wb') as f:
+        #     img.save(f, format='png')
+        # 以base64的格式返回图形验证码
+        del draw
+        buf = BytesIO()
+        img.save(buf, format='png')
+        data = 'data:image/png;base64,' + base64.b64encode(buf.getvalue()).decode(encoding='utf-8')
+        return HttpResponse(json.dumps({'url': data}))
 
 # 退出登录
 class login_out(APIView):

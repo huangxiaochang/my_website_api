@@ -19,12 +19,17 @@ from django.contrib import admin
 from django.urls import include
 
 from api.views import page_not_found
+from login.views import login_view, login_index_view, index_view
 
 from my_website_api import settings
 
 urlpatterns = [
     url(r'admin/', admin.site.urls),
     url(r'^', include("api.urls")),
+    url(r'^login_index/', login_index_view),
+    url(r'^login/', login_view),
+    url(r'^index/', index_view),
+    url(r'^captcha', include('captcha.urls')),
     url(r'^device_statistic_index/(.*)$', page_not_found)  # 支持前端vue的history模式，前端的路由要有一个base_router为device_statistic_index
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  # 支持媒体文件路径
 

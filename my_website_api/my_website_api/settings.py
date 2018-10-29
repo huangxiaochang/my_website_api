@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'api',
+    'login',
+    'captcha',  # 图形验证码用到的库
     'corsheaders',  # 解决跨域相关的库
     'rest_framework'  # 请求返回相关的库
 ]
@@ -138,13 +140,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
+# 这里配置的是静态资源访问的路径，即在模板中使用静态资源时， 在静态资源路径的前面加载这里配置的路径
 STATIC_URL = '/static/'
 
-# 前端vue项目的静态资源的路径
+# 前端vue项目的静态资源的存放的路径
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static/static/"),
 ]
 
-# 上传文件的路径配置
+# 上传文件的路径配置， 即上传之后， 存放媒体资源的路径
 MEDIA_ROOT = os.path.join(BASE_DIR, "static/images/")
-MEDIA_URL = '/upload/'  # 这个是在浏览器上访问该文件的url的前缀
+MEDIA_URL = '/upload/'  #访问媒体资源的路径， 即这个是在浏览器上访问该文件的url的前缀
