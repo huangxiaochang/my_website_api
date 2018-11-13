@@ -5,6 +5,8 @@ from django.db import models
 # 让上传的文件的路径动态地与user的名字相关
 from my_website_api.settings import MEDIA_ROOT
 
+# 对于ForeignKey类型的关系为多对一，  外键要放在多的一方
+
 # 用户信息
 class UserInfo(models.Model):
     password = models.CharField(max_length=255)

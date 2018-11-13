@@ -8,6 +8,8 @@ if __name__ == '__main__':
 # python3.exe manage.py makemigrations
 # python3.exe manage.py migrate
 
+# 使用pip freeze > ./requirements.txt  可以自动生成项目中依赖的库(在根目录下执行), 然后使用pip install -r requirements.txt就可以安装项目中的所有的依赖
+
 # admin :  root  hxc123456
 
 # python3.6安装MySQLdb不成功，可以使用PyMySQL来代替，python2安装MySQLdb时，可以从其他项目的虚拟环境中的Lib\site-packages中把所有的

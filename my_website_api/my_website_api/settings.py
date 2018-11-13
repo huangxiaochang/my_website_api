@@ -34,12 +34,12 @@ CORS_ALLOW_CREDENTIALS = True
 APPEND_SLASH = True
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'django.contrib.admin',  # admin管理后台站点
+    'django.contrib.auth',  # 身份认证系统
+    'django.contrib.contenttypes',  # 内容类型框架
+    'django.contrib.sessions',  # 会话框架
+    'django.contrib.messages',  # 消息框架
+    'django.contrib.staticfiles',  # 静态文件管理框架
     'api',
     'login',
     'captcha',  # 图形验证码用到的库
@@ -69,7 +69,7 @@ EMAIL_HOST_PASSWORD = 'lgbwlgbxgizediab'
 DEFAULT_FROM_EMAIL = '2297820776@qq.com'
 CONFIRM_DAYS = 1
 
-# 配置前端模块的路径
+# 配置前端模块的路径, django搜索模板的时候，会按照以下的配置的搜索路径和引擎进行render模板
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -84,6 +84,13 @@ TEMPLATES = [
             ],
         },
     },
+    # 可以在这里添加多个模板搜索引擎和搜索路径， 如添加jinja
+    {
+        'BACKEND': 'django.template.backends.jinja2.Jinja2',
+        'DIRS': [
+          os.path.join(BASE_DIR, 'templates/jinja2')
+        ],
+    }
 ]
 
 WSGI_APPLICATION = 'my_website_api.wsgi.application'
@@ -126,16 +133,17 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
+# LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh-hans'
+# TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
-
+# USE_TZ = True
+USE_TZ = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
